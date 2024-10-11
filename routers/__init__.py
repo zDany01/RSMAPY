@@ -1,1 +1,1 @@
-from . import server
+from .server import server as ServerRouter
