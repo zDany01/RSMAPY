@@ -14,7 +14,7 @@ def executeCommand(path: str, args: list[str | int | bool,] = [], errormsg: str 
     threadLock.acquire()
     command: list[str] = [path]
     command.extend(args)
-    print(f"Executing {path} with args: " + "".join(map(str, args)))
+    print(f"Executing {path} with args: " + "".join(map(lambda c: c + ' ' ,map(str, args))))
 
     try:
         global exitcode

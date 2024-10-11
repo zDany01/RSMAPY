@@ -2,9 +2,7 @@ from fastapi import FastAPI, responses
 from routers import server
 from pylib import pyUtils
 
-if not pyUtils.isSudo():
-    print("Make sure to execute this API with sudo priviledges")
-    exit(1)
+pyUtils.preBootCheck()
 
 api: FastAPI = FastAPI()
 
