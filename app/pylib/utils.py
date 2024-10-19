@@ -1,6 +1,7 @@
 import os
 from os.path import exists, dirname, abspath
 import logging
+from models import DockerAction, DockerList
 
 lg = logging.getLogger("uvicorn.RSMAPY")
 
@@ -22,3 +23,14 @@ def preBootCheck():
     if notAdmin:
         lg.error("Make sure to execute this API with sudo priviledges")
         exit(1)
+
+def DockerResponse(action: str, affectedList: list[str], totalCount: int) -> DockerAction:
+    response: DockerAction
+    affected: int = len(affectedList)
+    if(affected == 0):
+        response = DockerAction(action=action, result= "None")
+    elif (affected == totalCount):
+        response = DockerAction(action=action, result="Ok")
+    else:
+        response = DockerAction(action=action, result="Partial", docker=DockerList(affected=affected, ids=affectedList))
+    return response

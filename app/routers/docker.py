@@ -1,71 +1,34 @@
 from fastapi import APIRouter
 from pylib import DockerManager
+from pylib.utils import DockerResponse
+import models
 
 docker = APIRouter(prefix="/docker", tags=["Docker Management"])
 
-@docker.get("/stop")
+@docker.get("/stop", response_model=models.DockerAction)
 def stopDockers():
     CtIDs : list[str] = DockerManager.getContainers(True)
     returnArray: list[str] = []
     for i, value in enumerate(DockerManager.stopContainers(CtIDs)):
         if value == 0:
             returnArray.append(CtIDs[i])
-    
-    stoppedCount: int = len(returnArray)
-    if(stoppedCount == 0):
-        return {"result": "None"}
-    elif (stoppedCount == len(CtIDs)):
-        return {"result": "Ok"}
-    else:
-        return {
-                "result": "Partial",
-                "docker": {
-                    "stopped": stoppedCount,
-                    "ctIDs": returnArray
-                }
-            }
+    return DockerResponse("stop", returnArray, len(CtIDs))
 
 
-@docker.get("/start")
+@docker.get("/start", response_model=models.DockerAction)
 def startDockers():
     CtIDs : list[str] = DockerManager.getContainers()
     returnArray: list[str] = []
     for i, value in enumerate(DockerManager.startContainers(CtIDs, True)):
         if value == 0:
             returnArray.append(CtIDs[i])
+    return DockerResponse("start", returnArray, len(CtIDs))
     
-    startedCount: int = len(returnArray)
-    if(startedCount == 0):
-        return {"result": "None"}
-    elif (startedCount == len(CtIDs)):
-        return {"result": "Ok"}
-    else:
-        return {
-                "result": "Partial",
-                "docker": {
-                    "started": startedCount,
-                    "ctIDs": returnArray
-                }
-            }
-    
-@docker.get("/restart")
+@docker.get("/restart", response_model=models.DockerAction)
 def restartDockers():
     CtIDs : list[str] = DockerManager.getContainers(True)
     returnArray: list[str] = []
     for i, value in enumerate(DockerManager.startContainers(CtIDs, False)):
         if value == 2:
             returnArray.append(CtIDs[i])
-    
-    restartedCount: int = len(returnArray)
-    if(restartedCount == 0):
-        return {"result": "None"}
-    elif (restartedCount == len(CtIDs)):
-        return {"result": "Ok"}
-    else:
-        return {
-                "result": "Partial",
-                "docker": {
-                    "restarted": restartedCount,
-                    "ctIDs": returnArray
-                }
-            }
+    return DockerResponse("restart", returnArray, len(CtIDs))
