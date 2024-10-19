@@ -42,4 +42,5 @@ class DockerList(BaseModel):
 class DockerAction(BasicResponse):
     action: str
     docker: Optional[DockerList] = None
+    protectionSkip: bool
     invalid: Optional[list[str]] = None

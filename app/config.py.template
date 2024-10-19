@@ -1,3 +1,9 @@
+#API Settings
+#Include debug logs in the stdout
+DEBUG_LOGGING = False
+#List of IDs of containers that will be excluded from standard operation
+PROTECTED_CONTAINERS = []
+
 # Script settings
 BACKUP_SCRIPT_PATH = ""
 BACKUP_SCRIPT_ARGS = [] #Ex [arg1, arg2, arg3]
@@ -6,6 +12,3 @@ BACKUP_SCRIPT_ARGS = [] #Ex [arg1, arg2, arg3]
 # Change manually if different
 BACKUP_FLAG_PATH = BACKUP_SCRIPT_PATH[0:BACKUP_SCRIPT_PATH.rfind("/")] + "/update"
 NGINX_DB_UPDATE_PATH = ""
-
-#Include debug logs in the stdout
-DEBUG_LOGGING = False

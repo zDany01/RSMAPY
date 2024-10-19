@@ -2,6 +2,7 @@ import os
 from os.path import exists, dirname, abspath
 import logging
 from models import DockerAction, DockerList
+import config
 
 lg = logging.getLogger("uvicorn.RSMAPY")
 
@@ -24,18 +25,25 @@ def preBootCheck():
         lg.error("Make sure to execute this API with sudo priviledges")
         exit(1)
 
-def DockerResponse(action: str, affectedList: list[str], totalCount: int, invalidList: list[str] = None) -> DockerAction:
+def DockerResponse(action: str, affectedList: list[str], totalCount: int, oLenght: int, invalidList: list[str] = None) -> DockerAction:
     response: DockerAction
     affected: int = len(affectedList)
+    protectionSkip: bool = oLenght != totalCount
     if(affected == 0):
-        response = DockerAction(action=action, result= "None")
+        response = DockerAction(action=action, result= "None", protectionSkip=protectionSkip)
     elif (affected == totalCount):
-        response = DockerAction(action=action, result="Valid" if invalidList else "Ok")
+        response = DockerAction(action=action, result="Valid" if invalidList else "Ok", protectionSkip=protectionSkip)
     else:
-        response = DockerAction(action=action, result="Partial", docker=DockerList(affected=affected, ids=affectedList))
+        response = DockerAction(action=action, result="Partial", docker=DockerList(affected=affected, ids=affectedList), protectionSkip=protectionSkip)
 
     if(invalidList):
         if(totalCount == 0): #totalCount can be 0 if and only all the data is invalid because totalCount represent all existing containers
             response.result = "Invalid"
         response.invalid = invalidList
     return response
+
+def CheckProtected(CtID: str) -> bool:
+    return CtID in config.PROTECTED_CONTAINERS
+
+def filterProtected(CtIDs: list[str]) -> list[str]:
+    return [x for x in CtIDs if x not in config.PROTECTED_CONTAINERS]
