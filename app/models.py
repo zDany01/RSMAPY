@@ -44,3 +44,6 @@ class DockerAction(BasicResponse):
     docker: Optional[DockerList] = None
     protectionSkip: bool
     invalid: Optional[list[str]] = None
+
+class DockerPowerStatus(BasicResponse):
+    power: Literal["Stopped", "Started", "Up", "Down"]
