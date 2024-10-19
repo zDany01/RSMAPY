@@ -6,6 +6,9 @@ def getContainers(activeOnly: bool = False) -> list[str]:
     containerlistprc: ProcessOutput = executeCommand("docker", ["ps", "-a", "-q"] if not activeOnly else ["ps", "-q"], "Unable to get container list", 500)
     return containerlistprc.output.splitlines() if containerlistprc.good else None
 
+def getContainerID(filterString: str) -> str:
+    return executeCommand("docker", ["ps", "-a", "--filter", filterString, "--format", "{{.ID}}"], "Unable to get container list", 500).output
+
 def getContainersData(Containers: Literal["ALL", "ACTIVE"] = "ACTIVE", formatString: str = "") -> str:
     return executeCommand("docker", ["ps", "-a", "--format", formatString] if Containers == "ALL" else ["ps", "--format", formatString], "Unable to get containers data", 500).output
 
@@ -17,6 +20,24 @@ def getContainerDataList(CtIDs: list[str], formatString: str = None) -> list[str
     for CtID in CtIDs:
         dataList.append(getContainerData(CtID, formatString))
     return dataList
+
+def parseContainers(CtIDs: list[str], CtNames: list[str]) -> tuple[list[str], list[str]]:
+    valid: list[str] = []
+    invalid: list[str] = []
+    if CtIDs:
+        for CtID in CtIDs:
+            if getContainerData(CtID, "{{.ID}}"): #if the container does not exists then by filtering its ID and using that output format the result string should be void, so the if doesn't get executed
+                valid.append(CtID)
+            else:
+                invalid.append(CtID)
+    if CtNames:
+        for CtName in CtNames:
+            id: str = getContainerID("name=" + CtName).strip()
+            if id:
+                valid.append(id)
+            else:
+                invalid.append(CtName)
+    return (valid, invalid)
 
 def startContainer(CtID: str, startOnly: bool = True, errormsg: str = "") -> int:
     """

@@ -24,13 +24,18 @@ def preBootCheck():
         lg.error("Make sure to execute this API with sudo priviledges")
         exit(1)
 
-def DockerResponse(action: str, affectedList: list[str], totalCount: int) -> DockerAction:
+def DockerResponse(action: str, affectedList: list[str], totalCount: int, invalidList: list[str] = None) -> DockerAction:
     response: DockerAction
     affected: int = len(affectedList)
     if(affected == 0):
         response = DockerAction(action=action, result= "None")
     elif (affected == totalCount):
-        response = DockerAction(action=action, result="Ok")
+        response = DockerAction(action=action, result="Valid" if invalidList else "Ok")
     else:
         response = DockerAction(action=action, result="Partial", docker=DockerList(affected=affected, ids=affectedList))
+
+    if(invalidList):
+        if(totalCount == 0): #totalCount can be 0 if and only all the data is invalid because totalCount represent all existing containers
+            response.result = "Invalid"
+        response.invalid = invalidList
     return response
