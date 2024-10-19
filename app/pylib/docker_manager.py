@@ -6,8 +6,14 @@ def getContainers(activeOnly: bool = False) -> list[str]:
     containerlistprc: ProcessOutput = executeCommand("docker", ["ps", "-a", "-q"] if not activeOnly else ["ps", "-q"], "Unable to get container list", 500)
     return containerlistprc.output.splitlines() if containerlistprc.good else None
 
+def getContainerIDs(filterString: str) -> list[str]:
+    return executeCommand("docker", ["ps", "-a", "--filter", filterString, "--format", "{{.ID}}"], "Unable to get container list", 500).output.splitlines()
+
 def getContainerID(filterString: str) -> str:
-    return executeCommand("docker", ["ps", "-a", "--filter", filterString, "--format", "{{.ID}}"], "Unable to get container list", 500).output
+    try:
+        return getContainerIDs(filterString)[0]
+    except IndexError:
+        return ""
 
 def getContainersData(Containers: Literal["ALL", "ACTIVE"] = "ACTIVE", formatString: str = "") -> str:
     return executeCommand("docker", ["ps", "-a", "--format", formatString] if Containers == "ALL" else ["ps", "--format", formatString], "Unable to get containers data", 500).output

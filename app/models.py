@@ -8,8 +8,24 @@ class DockerInput(BaseModel):
 
     @model_validator(mode="after")
     def checkEmpty(self: Self) -> Self:
-        if self.range == "Custom" and (len(self.containers) if self.containers else 0) + (len(self.containerNames) if self.containerNames else 0) == 0:
-            raise ValueError("The combined sent values does not indicate at least 1 container")
+        if(self.range == "Custom"):  
+            fcontainers: list[str] = []
+            fcontainerNames: list[str] = []
+            
+            if(self.containers):
+                for ct in self.containers:
+                    if(ct.strip()): #checks if a string is not void or whitespace
+                        fcontainers.append(ct)
+            if(self.containerNames):
+                for ctn in self.containerNames:
+                    if(ctn.strip()):
+                        fcontainerNames.append(ctn)
+
+            if len(fcontainers) + len(fcontainerNames) == 0:
+                raise ValueError("The combined sent values does not indicate at least 1 container")
+            
+            self.containers = fcontainers
+            self.containerNames = fcontainerNames
         return self
 
 class BasicResponse(BaseModel):
