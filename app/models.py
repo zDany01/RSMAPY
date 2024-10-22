@@ -47,3 +47,7 @@ class DockerAction(BasicResponse):
 
 class DockerPowerStatus(BasicResponse):
     power: Literal["Stopped", "Started", "Up", "Down"]
+
+class LoginInfo(BaseModel):
+    username: str
+    password: str

@@ -25,6 +25,9 @@ def preBootCheck():
         lg.error("Make sure to execute this API with sudo priviledges")
         exit(1)
 
+    if config.AUTH_SECRET != "Random" and len(config.AUTH_SECRET.strip()) < 16:
+        lg.warning("It is recommended to use a secret with at least 16 character")
+
 def DockerResponse(action: str, affectedList: list[str], totalCount: int, oLenght: int, invalidList: list[str] = None) -> DockerAction:
     response: DockerAction
     affected: int = len(affectedList)

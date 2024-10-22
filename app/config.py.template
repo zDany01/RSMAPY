@@ -4,6 +4,18 @@ DEBUG_LOGGING = False
 #List of IDs of containers that will be excluded from standard operation
 PROTECTED_CONTAINERS = []
 
+#Auth setting
+#Timeout for the API Token in minutes
+TOKEN_TIMEOUT = 30
+#The server secret key used to generate JWT Token, if unsure leave Random
+#By typing Random every time the server starts a new key will be created and previously generated token will not work so the user will need to login again
+AUTH_SECRET = "Random"
+#Login username
+AUTH_USERNAME = "user"
+#Bcrypt login password hash (default admin123)
+#Generate your hash here https://bcrypt.online/
+AUTH_PASSWORD_HASH = "$2y$10$FhflrYHMqB67.X6vP1VTx.ZB2pkOBi648WE5GB6ylPu85K0lOORQW"
+
 # Script settings
 BACKUP_SCRIPT_PATH = ""
 BACKUP_SCRIPT_ARGS = [] #Ex [arg1, arg2, arg3]

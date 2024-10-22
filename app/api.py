@@ -1,11 +1,12 @@
 from fastapi import FastAPI, responses
-from routers import ServerRouter, DockersRouter, DockerRouter
+from routers import ServerRouter, DockersRouter, DockerRouter, AuthRouter
 from pylib import pyUtils
 
 pyUtils.preBootCheck()
 
 api: FastAPI = FastAPI()
 
+api.include_router(AuthRouter)
 api.include_router(ServerRouter)
 api.include_router(DockersRouter)
 api.include_router(DockerRouter)
