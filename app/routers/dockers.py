@@ -1,12 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pylib import DockerManager
 from pylib.utils import DockerResponse, filterProtected
+from pylib.security import verifyJWT
 from models import DockerAction, DockerInput
 
 dockers = APIRouter(prefix="/dockers", tags=["Docker Management"])
 
 @dockers.post("/stop", response_model=DockerAction)
-def stopDockers(dockerInput: DockerInput):
+def stopDockers(dockerInput: DockerInput, _ = Depends(verifyJWT)):
     CtIDs: list[str]
     invalid: list[str] = None
     if dockerInput.range == "Custom":
@@ -24,7 +25,7 @@ def stopDockers(dockerInput: DockerInput):
 
 
 @dockers.post("/start", response_model=DockerAction)
-def startDockers(dockerInput: DockerInput):
+def startDockers(dockerInput: DockerInput, _ = Depends(verifyJWT)):
     CtIDs: list[str]
     invalid: list[str] = None
     if dockerInput.range == "Custom":
@@ -40,7 +41,7 @@ def startDockers(dockerInput: DockerInput):
     return DockerResponse("start", successList, lenght, lenght, invalid)
     
 @dockers.post("/restart", response_model=DockerAction)
-def restartDockers(dockerInput: DockerInput):
+def restartDockers(dockerInput: DockerInput, _ = Depends(verifyJWT)):
     CtIDs: list[str]
     invalid: list[str] = None
     if dockerInput.range == "Custom":

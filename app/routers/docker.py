@@ -1,32 +1,33 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.responses import PlainTextResponse
 from pylib import DockerManager, executeCommand
+from pylib.security import verifyJWT
 from models import DockerPowerStatus
 from json import loads
 
 docker = APIRouter(prefix="/docker/{CtID}", tags=["Single Container"])
 
 @docker.get("/")
-def dockerInfo(CtID: str):
+def dockerInfo(CtID: str, _ = Depends(verifyJWT)):
     if not DockerManager.getContainerData(CtID, "{{.ID}}"):
         raise HTTPException(status.HTTP_404_NOT_FOUND)
     return loads(executeCommand("docker", ["inspect", CtID], "Unable to access the container with ID " + CtID, 500).output)[0]
 
 @docker.get("/stop", response_model=DockerPowerStatus)
-def stopContainer(CtID: str):
+def stopContainer(CtID: str, _ = Depends(verifyJWT)):
     if not DockerManager.getContainerData(CtID, "{{.ID}}"):
         raise HTTPException(status.HTTP_404_NOT_FOUND)
     return DockerPowerStatus(result="None", power="Down") if DockerManager.stopContainer(CtID, "Unable to stop the container with ID " + CtID) else DockerPowerStatus(result="Ok", power="Stopped")
 
 @docker.get("/start", response_model=DockerPowerStatus)
-def startContainer(CtID: str):
+def startContainer(CtID: str, _ = Depends(verifyJWT)):
     if not DockerManager.getContainerData(CtID, "{{.ID}}"):
         raise HTTPException(status.HTTP_404_NOT_FOUND)
     return DockerPowerStatus(result="None", power="Up") if DockerManager.startContainer(CtID, errormsg="Unable to stop the container with ID " + CtID) else DockerPowerStatus(result="Ok", power="Started")
 
 
 @docker.get("/restart", response_model=DockerPowerStatus)
-def restartContainer(CtID: str):
+def restartContainer(CtID: str, _ = Depends(verifyJWT)):
     if not DockerManager.getContainerData(CtID, "{{.ID}}"):
         raise HTTPException(status.HTTP_404_NOT_FOUND)
     DockerManager.startContainer(CtID, False, "Unable to stop the container with ID " + CtID)
@@ -36,7 +37,7 @@ def restartContainer(CtID: str):
     return DockerPowerStatus(result="Ok", power="Started")
 
 @docker.get("/ports")
-def getContainerPorts(CtID: str):
+def getContainerPorts(CtID: str, _ = Depends(verifyJWT)):
     if not DockerManager.getContainerData(CtID, "{{.ID}}"):
         raise HTTPException(status.HTTP_404_NOT_FOUND)
     json: dict = loads(executeCommand("docker", ["inspect", CtID, "--format", "{{json .NetworkSettings.Ports}}"], "Unable to access the published port of CtID " + CtID, 500).output)
@@ -45,7 +46,7 @@ def getContainerPorts(CtID: str):
     return json
 
 @docker.get("/logs", response_class=PlainTextResponse)
-def getContainerLogs(CtID: str):
+def getContainerLogs(CtID: str, _ = Depends(verifyJWT)):
     if not DockerManager.getContainerData(CtID, "{{.ID}}"):
         raise HTTPException(status.HTTP_404_NOT_FOUND)
     logs: str = executeCommand("docker", ["logs", CtID], "Unable to get logs for CtID " + CtID, 500).output
