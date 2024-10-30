@@ -1,0 +1,36 @@
+#!/bin/bash
+
+APP_NAME=RSMAPY #Will be used for creating the virtualenv
+PY_PACKAGE="fastapi[all] bcrypt python-jose[cryptography]" #base application package
+DESC="A python API to remotely manage a server" #Simple description
+SERVICE_NAME=RSMAPY #Systemd service name
+
+if [[ $EUID -ne 0 ]]; then
+    echo "Run as root"
+    exit 1
+fi
+
+if ! [ -d ./$APP_NAME ]; then
+  virtualenv $APP_NAME
+  source ./$APP_NAME/bin/activate
+  pip3 install $PY_PACKAGE
+  deactivate
+fi
+
+echo "[Unit]
+Description=$DESC
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+WorkingDirectory=$(pwd)
+ExecStart=$(pwd)/pystart
+
+[Install]
+WantedBy=multi-user.target" > /etc/systemd/system/$SERVICE_NAME.service
+systemctl enable $SERVICE_NAME
+systemctl start $SERVICE_NAME
+echo Done.

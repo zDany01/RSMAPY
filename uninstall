@@ -1,0 +1,14 @@
+#!/bin/bash
+
+APP_NAME=RSMAPY #Will be used for creating the virtualenv
+SERVICE_NAME=RSMAPY #Systemd service name
+
+if [[ $EUID -ne 0 ]]; then
+    echo "Run as root"
+    exit 1
+fi
+systemctl disable $SERVICE_NAME
+rm /etc/systemd/system/$SERVICE_NAME.service
+rm ./$APP_NAME -rf
+rm ./__pycache__ -rf
+echo Done.

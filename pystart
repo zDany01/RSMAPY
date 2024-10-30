@@ -1,0 +1,13 @@
+#!/bin/bash
+APP_NAME=RSMAPY
+
+#This file will be executed when the service is installed, setup your logic here
+#Uncomment this block of code if you want root-only execution
+#if [[ $EUID -ne 0 ]]; then
+#    echo "Run as root"
+#    exit 1
+#fi
+
+source ./$APP_NAME/bin/activate
+python3 -m uvicorn --app-dir app api:api --host 0.0.0.0 --port 8699
+deactivate
