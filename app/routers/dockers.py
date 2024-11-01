@@ -6,10 +6,10 @@ from models import DockerAction, DockerInput
 from typing import Annotated
 from openapi_examples import generateDockerActionExample, DOCKER_INPUT_EXAMPLES
 
-dockers = APIRouter(prefix="/dockers", tags=["Docker Management"])
+dockers = APIRouter(prefix="/dockers", dependencies=[Depends(verifyJWT)], tags=["Docker Management"])
 
 @dockers.post("/stop", response_model=DockerAction, summary="Stop a range of docker containers", responses={200: {"content": generateDockerActionExample("stop")}})
-def stopDockers(dockerInput: Annotated[DockerInput, Body(openapi_examples=DOCKER_INPUT_EXAMPLES)],  _ = Depends(verifyJWT)):
+def stopDockers(dockerInput: Annotated[DockerInput, Body(openapi_examples=DOCKER_INPUT_EXAMPLES)]):
     CtIDs: list[str]
     invalid: list[str] = None
     if dockerInput.range == "Custom":
@@ -27,7 +27,7 @@ def stopDockers(dockerInput: Annotated[DockerInput, Body(openapi_examples=DOCKER
 
 
 @dockers.post("/start", response_model=DockerAction, summary="Start a range of docker containers", responses={200: {"content": generateDockerActionExample("start")}})
-def startDockers(dockerInput: Annotated[DockerInput, Body(openapi_examples=DOCKER_INPUT_EXAMPLES)], _ = Depends(verifyJWT)):
+def startDockers(dockerInput: Annotated[DockerInput, Body(openapi_examples=DOCKER_INPUT_EXAMPLES)]):
     CtIDs: list[str]
     invalid: list[str] = None
     if dockerInput.range == "Custom":
@@ -43,7 +43,7 @@ def startDockers(dockerInput: Annotated[DockerInput, Body(openapi_examples=DOCKE
     return DockerResponse("start", successList, lenght, lenght, invalid)
     
 @dockers.post("/restart", response_model=DockerAction, summary="Restart a range of docker containers", responses={200: {"content": generateDockerActionExample("restart")}})
-def restartDockers(dockerInput: Annotated[DockerInput, Body(openapi_examples=DOCKER_INPUT_EXAMPLES)], _ = Depends(verifyJWT)):
+def restartDockers(dockerInput: Annotated[DockerInput, Body(openapi_examples=DOCKER_INPUT_EXAMPLES)]):
     CtIDs: list[str]
     invalid: list[str] = None
     if dockerInput.range == "Custom":

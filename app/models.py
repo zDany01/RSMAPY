@@ -51,3 +51,6 @@ class DockerPowerStatus(BasicResponse):
 class LoginInfo(BaseModel):
     username: str
     password: str
+
+class LoginResponse(BaseModel):
+    token: str
