@@ -5,7 +5,7 @@ from config import AUTH_USERNAME, AUTH_PASSWORD_HASH
 
 auth = APIRouter()
 
-@auth.post("/login")
+@auth.post("/login", summary="Login with credentials", tags=["API"], responses={404: {"description": "Invalid Credentials"}})
 def login(userInfo: LoginInfo):
     if userInfo.username == AUTH_USERNAME and verifyHash(userInfo.password, AUTH_PASSWORD_HASH):
         return {"token": createJWT({})}

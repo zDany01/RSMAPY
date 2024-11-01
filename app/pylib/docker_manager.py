@@ -27,6 +27,16 @@ def getContainerDataList(CtIDs: list[str], formatString: str = None) -> list[str
     return dataList
 
 def parseContainers(CtIDs: list[str], CtNames: list[str]) -> tuple[list[str], list[str]]:
+    """
+    Parses the given lists to find existing containers
+
+    Params:
+        CtIDs(list[str]): a list of container IDs
+        CtNames(list[str]): a list of container names
+
+    Returns:
+        parsedTuple(tuple[list[str], list[str]]): a tuple of two lists which contains valid ids and invalid container names/ids
+    """
     valid: list[str] = []
     invalid: list[str] = []
     if CtIDs:

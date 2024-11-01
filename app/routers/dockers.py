@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Body, Depends
 from pylib import DockerManager
 from pylib.utils import DockerResponse, filterProtected
 from pylib.security import verifyJWT
 from models import DockerAction, DockerInput
+from typing import Annotated
+from openapi_examples import generateDockerActionExample, DOCKER_INPUT_EXAMPLES
 
 dockers = APIRouter(prefix="/dockers", tags=["Docker Management"])
 
-@dockers.post("/stop", response_model=DockerAction)
-def stopDockers(dockerInput: DockerInput, _ = Depends(verifyJWT)):
+@dockers.post("/stop", response_model=DockerAction, summary="Stop a range of docker containers", responses={200: {"content": generateDockerActionExample("stop")}})
+def stopDockers(dockerInput: Annotated[DockerInput, Body(openapi_examples=DOCKER_INPUT_EXAMPLES)],  _ = Depends(verifyJWT)):
     CtIDs: list[str]
     invalid: list[str] = None
     if dockerInput.range == "Custom":
@@ -24,8 +26,8 @@ def stopDockers(dockerInput: DockerInput, _ = Depends(verifyJWT)):
     return DockerResponse("stop", successList, len(CtIDs), oLenght, invalid)
 
 
-@dockers.post("/start", response_model=DockerAction)
-def startDockers(dockerInput: DockerInput, _ = Depends(verifyJWT)):
+@dockers.post("/start", response_model=DockerAction, summary="Start a range of docker containers", responses={200: {"content": generateDockerActionExample("start")}})
+def startDockers(dockerInput: Annotated[DockerInput, Body(openapi_examples=DOCKER_INPUT_EXAMPLES)], _ = Depends(verifyJWT)):
     CtIDs: list[str]
     invalid: list[str] = None
     if dockerInput.range == "Custom":
@@ -40,8 +42,8 @@ def startDockers(dockerInput: DockerInput, _ = Depends(verifyJWT)):
             successList.append(CtIDs[i])
     return DockerResponse("start", successList, lenght, lenght, invalid)
     
-@dockers.post("/restart", response_model=DockerAction)
-def restartDockers(dockerInput: DockerInput, _ = Depends(verifyJWT)):
+@dockers.post("/restart", response_model=DockerAction, summary="Restart a range of docker containers", responses={200: {"content": generateDockerActionExample("restart")}})
+def restartDockers(dockerInput: Annotated[DockerInput, Body(openapi_examples=DOCKER_INPUT_EXAMPLES)], _ = Depends(verifyJWT)):
     CtIDs: list[str]
     invalid: list[str] = None
     if dockerInput.range == "Custom":
